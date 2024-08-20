@@ -1,4 +1,4 @@
-[![Report build](https://github.uio.no/2023-s2-in5310-in9310/example-p1/actions/workflows/build.yml/badge.svg?branch=report)](https://github.uio.no/2023-s2-in5310-in9310/example-p1/actions/workflows/build.yml)
+[![Report build](https://github.uio.no/2024-s2-in5310-in9310/example-p1/actions/workflows/build.yml/badge.svg?branch=report)](https://github.uio.no/2024-s2-in5310-in9310/example-p1/actions/workflows/build.yml)
 # Example Project Setup
 
 This repository can be cloned and used as the basis for project 1 in IN5310/IN9310.
