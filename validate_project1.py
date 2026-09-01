@@ -15,8 +15,17 @@ check that your implementation of load_my_models() works
 as intended.
 """
 
+import sys
+
 import torch
-# import your own modules
+
+sys.path.append("src")
+
+from lora import apply_lora  # noqa: E402
+from model import get_vit  # noqa: E402
+from utils import get_device, load_checkpoint  # noqa: E402
+
+NUM_CLASSES = 10
 
 
 # Get your fine-tuned models here.
@@ -27,8 +36,15 @@ def load_my_models():
     Return the models in the order indicated below,
     so the teachers can test them.
     """
+    device = get_device()
 
-    raise NotImplementedError()
+    full_model = get_vit(num_classes=NUM_CLASSES, pretrained=False)
+    full_model = load_checkpoint(full_model, "output/full_model.pt", map_location=device)
+
+    lora_model = get_vit(num_classes=NUM_CLASSES, pretrained=False)
+    lora_model = apply_lora(lora_model)
+    lora_model = load_checkpoint(lora_model, "output/lora_model.pt", map_location=device)
+
     return full_model, lora_model
 
 
@@ -43,11 +59,11 @@ def test_load_my_models():
     lora_model.eval()
 
     # Send an example through the models, to check that they loaded properly
-    test_img = torch.load('output/test_img.pth')
+    test_img = torch.load("output/test_img.pth")
     with torch.no_grad():
         _ = full_model(test_img.unsqueeze(0).to(device))
         _ = lora_model(test_img.unsqueeze(0).to(device))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     test_load_my_models()
