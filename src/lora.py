@@ -45,3 +45,24 @@ class LoRALinear(nn.Module):
 
 
 
+def apply_lora(model, rank: int = 10, alpha: float = None):
+    for name, param in model.named_parameters():
+        if name in ['norm.weight', 'norm.bias', 'head.weight', 'head.bias']:
+            param.requires_grad = True
+        else:
+            param.requires_grad = False
+        
+    for block in model.blocks:
+        # Wrap linear layers in the attention block
+        block.attn.qkv = LoRALinear(block.attn.qkv, rank=rank, alpha=alpha).to(device)
+        block.attn.proj = LoRALinear(block.attn.proj, rank=rank, alpha=alpha).to(device)
+
+        # Unfreeze the attention block
+        block.attn.requires_grad_(True)
+
+        # Unfreeze LayerScale layers as well
+        block.ls1.requires_grad_(True)
+        block.ls2.requires_grad_(True)
+            
+
+
