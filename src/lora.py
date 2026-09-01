@@ -63,6 +63,8 @@ def apply_lora(model, rank: int = 10, alpha: float = None):
         # Unfreeze LayerScale layers as well
         block.ls1.requires_grad_(True)
         block.ls2.requires_grad_(True)
+
+    return model
             
 
 
