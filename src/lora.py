@@ -66,3 +66,7 @@ def apply_lora(model, rank: int = 10, alpha: float = None):
             
 
 
+def get_lora_trainable_params(model):
+    """ Returns the trainable parameters of the model after applying LoRA """
+    trainable_parameters = [param for param in model.parameters() if param.requires_grad]
+    return trainable_parameters
