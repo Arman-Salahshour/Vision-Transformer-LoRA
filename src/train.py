@@ -69,29 +69,38 @@ def main():
     train_loader, val_loader, classes = get_dataloaders(args.data_dir, args.batch_size)
     model = build_model(args.mode, num_classes=len(classes), rank=args.lora_rank, alpha=args.lora_alpha).to(device)
 
+    set_seed(args.seed)
+
     trainable = [p for p in model.parameters() if p.requires_grad]
     optimizer = torch.optim.AdamW(trainable, lr=args.lr)
     criterion = nn.CrossEntropyLoss()
 
     history = []
-    with Timer() as t:
-        for epoch in range(args.epochs):
+    total_train_time = 0.0
+    total_val_time = 0.0
+    for epoch in range(args.epochs):
+        with Timer() as train_timer:
             train_loss, train_acc = train_one_epoch(model, train_loader, optimizer, criterion, device)
+        with Timer() as val_timer:
             val_loss, val_acc = evaluate(model, val_loader, criterion, device)
-            print(
-                f"epoch {epoch + 1}/{args.epochs} | "
-                f"train loss {train_loss:.4f} acc {train_acc:.4f} | "
-                f"val loss {val_loss:.4f} acc {val_acc:.4f}"
-            )
-            history.append({
-                "epoch": epoch + 1,
-                "train_loss": train_loss,
-                "train_acc": train_acc,
-                "val_loss": val_loss,
-                "val_acc": val_acc,
-            })
+        total_train_time += train_timer.elapsed
+        total_val_time += val_timer.elapsed
+        print(
+            f"epoch {epoch + 1}/{args.epochs} | "
+            f"train loss {train_loss:.4f} acc {train_acc:.4f} ({train_timer.elapsed:.1f}s) | "
+            f"val loss {val_loss:.4f} acc {val_acc:.4f} ({val_timer.elapsed:.1f}s)"
+        )
+        history.append({
+            "epoch": epoch + 1,
+            "train_loss": train_loss,
+            "train_acc": train_acc,
+            "val_loss": val_loss,
+            "val_acc": val_acc,
+            "train_time_seconds": train_timer.elapsed,
+            "val_time_seconds": val_timer.elapsed,
+        })
 
-    print(f"Training time ({args.mode}): {t.elapsed:.1f}s")
+    print(f"Training time ({args.mode}): {total_train_time:.1f}s (val: {total_val_time:.1f}s)")
 
     ckpt_path = f"output/{args.mode}_model.pt"
     save_checkpoint(model, ckpt_path)
@@ -110,7 +119,8 @@ def main():
             "lora_rank": args.lora_rank if args.mode == "lora" else None,
             "lora_alpha": args.lora_alpha if args.mode == "lora" else None,
         },
-        "training_time_seconds": t.elapsed,
+        "training_time_seconds": total_train_time,
+        "validation_time_seconds": total_val_time,
         "trainable_params": trainable_count,
         "total_params": total_count,
         "trainable_pct": 100 * trainable_count / total_count,
