@@ -4,11 +4,10 @@ import torch
 import torch.nn as nn
 from tqdm import tqdm
 
+from constants import DEFAULT_DATA_DIR, LORA_ALPHA, LORA_RANK, SEED, device
 from data import get_dataloaders
 from model import get_vit
-from utils import AverageMeter, Timer, get_device, save_checkpoint, set_seed
-
-DEFAULT_DATA_DIR = "data/imagewoof2"
+from utils import AverageMeter, Timer, save_checkpoint, set_seed
 
 
 def train_one_epoch(model, loader, optimizer, criterion, device):
@@ -43,12 +42,12 @@ def evaluate(model, loader, criterion, device):
     return loss_meter.avg, acc_meter.avg
 
 
-def build_model(mode: str, num_classes: int):
+def build_model(mode: str, num_classes: int, rank: int = 10, alpha: float = None):
     model = get_vit(num_classes=num_classes, pretrained=True)
     if mode == "lora":
-        from lora import apply_lora  # import lazy ->'full' mode works before lora.py is finished
+        from lora import apply_lora 
 
-        model = apply_lora(model)
+        model = apply_lora(model, rank=rank, alpha=alpha)
     return model
 
 
@@ -59,14 +58,15 @@ def main():
     parser.add_argument("--epochs", type=int, default=5)
     parser.add_argument("--batch-size", type=int, default=64)
     parser.add_argument("--lr", type=float, default=1e-4)
-    parser.add_argument("--seed", type=int, default=1)
+    parser.add_argument("--seed", type=int, default=SEED)
+    parser.add_argument("--lora-rank", type=int, default=LORA_RANK, help="LoRA rank r (ignored in full mode)")
+    parser.add_argument("--lora-alpha", type=float, default=LORA_ALPHA, help="LoRA alpha scaling (ignored in full mode)")
     args = parser.parse_args()
 
     set_seed(args.seed)
-    device = get_device()
 
     train_loader, val_loader, classes = get_dataloaders(args.data_dir, args.batch_size)
-    model = build_model(args.mode, num_classes=len(classes)).to(device)
+    model = build_model(args.mode, num_classes=len(classes), rank=args.lora_rank, alpha=args.lora_alpha).to(device)
 
     trainable = [p for p in model.parameters() if p.requires_grad]
     optimizer = torch.optim.AdamW(trainable, lr=args.lr)

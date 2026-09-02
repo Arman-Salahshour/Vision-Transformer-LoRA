@@ -4,8 +4,7 @@
 import timm
 import torch.nn as nn
 
-MODEL_NAME = "vit_tiny_patch16_224"
-NUM_CLASSES = 10  # ImageWoof: 10 dog breeds
+from constants import MODEL_NAME, NUM_CLASSES
 
 
 def get_vit(num_classes: int = NUM_CLASSES, pretrained: bool = True) -> nn.Module:

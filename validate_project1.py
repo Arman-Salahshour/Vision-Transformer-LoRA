@@ -21,11 +21,10 @@ import torch
 
 sys.path.append("src")
 
+from constants import NUM_CLASSES, device  # noqa: E402
 from lora import apply_lora  # noqa: E402
 from model import get_vit  # noqa: E402
-from utils import get_device, load_checkpoint  # noqa: E402
-
-NUM_CLASSES = 10
+from utils import load_checkpoint  # noqa: E402
 
 
 # Get your fine-tuned models here.
@@ -36,8 +35,6 @@ def load_my_models():
     Return the models in the order indicated below,
     so the teachers can test them.
     """
-    device = get_device()
-
     full_model = get_vit(num_classes=NUM_CLASSES, pretrained=False)
     full_model = load_checkpoint(full_model, "output/full_model.pt", map_location=device)
 
@@ -51,7 +48,6 @@ def load_my_models():
 def test_load_my_models():
     full_model, lora_model = load_my_models()
 
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     full_model = full_model.to(device)
     lora_model = lora_model.to(device)
 

@@ -5,11 +5,7 @@ from torch.utils.data import DataLoader
 from torchvision import transforms
 from torchvision.datasets import ImageFolder
 
-# print(m.default_cfg["mean"],m.default_cfg["std"])
-IMAGENET_MEAN = [0.5, 0.5, 0.5]
-IMAGENET_STD = [0.5, 0.5, 0.5]
-
-IMG_SIZE = 224  # required input size for vit_tiny_patch16_224
+from constants import IMG_SIZE, VIT_MEAN, VIT_STD
 
 
 def get_transforms(train: bool):
@@ -19,7 +15,7 @@ def get_transforms(train: bool):
                 transforms.RandomResizedCrop(IMG_SIZE),
                 transforms.RandomHorizontalFlip(),
                 transforms.ToTensor(),
-                transforms.Normalize(IMAGENET_MEAN, IMAGENET_STD),
+                transforms.Normalize(VIT_MEAN, VIT_STD),
             ]
         )
     return transforms.Compose( # -> standardized val-data, no randomness
@@ -27,7 +23,7 @@ def get_transforms(train: bool):
             transforms.Resize(256),
             transforms.CenterCrop(IMG_SIZE),
             transforms.ToTensor(),
-            transforms.Normalize(IMAGENET_MEAN, IMAGENET_STD),
+            transforms.Normalize(VIT_MEAN, VIT_STD),
         ]
     )
 

@@ -4,6 +4,7 @@ import time
 import numpy as np
 import torch
 
+from constants import SEED
 
 def set_seed(seed: int = 1) -> None:
     random.seed(seed)
@@ -46,11 +47,6 @@ class AverageMeter:
     @property
     def avg(self) -> float:
         return self.sum / max(self.count, 1)
-
-
-def get_device() -> torch.device:
-    return torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
 
 def save_checkpoint(model: torch.nn.Module, path: str) -> None:
     torch.save(model.state_dict(), path)
