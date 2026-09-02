@@ -1,4 +1,5 @@
 import argparse
+import json
 
 import torch
 import torch.nn as nn
@@ -72,6 +73,7 @@ def main():
     optimizer = torch.optim.AdamW(trainable, lr=args.lr)
     criterion = nn.CrossEntropyLoss()
 
+    history = []
     with Timer() as t:
         for epoch in range(args.epochs):
             train_loss, train_acc = train_one_epoch(model, train_loader, optimizer, criterion, device)
@@ -81,12 +83,46 @@ def main():
                 f"train loss {train_loss:.4f} acc {train_acc:.4f} | "
                 f"val loss {val_loss:.4f} acc {val_acc:.4f}"
             )
+            history.append({
+                "epoch": epoch + 1,
+                "train_loss": train_loss,
+                "train_acc": train_acc,
+                "val_loss": val_loss,
+                "val_acc": val_acc,
+            })
 
     print(f"Training time ({args.mode}): {t.elapsed:.1f}s")
 
     ckpt_path = f"output/{args.mode}_model.pt"
     save_checkpoint(model, ckpt_path)
     print(f"Saved checkpoint to {ckpt_path}")
+
+    trainable_count = sum(p.numel() for p in trainable)
+    total_count = sum(p.numel() for p in model.parameters())
+
+    results = {
+        "mode": args.mode,
+        "config": {
+            "epochs": args.epochs,
+            "batch_size": args.batch_size,
+            "lr": args.lr,
+            "seed": args.seed,
+            "lora_rank": args.lora_rank if args.mode == "lora" else None,
+            "lora_alpha": args.lora_alpha if args.mode == "lora" else None,
+        },
+        "training_time_seconds": t.elapsed,
+        "trainable_params": trainable_count,
+        "total_params": total_count,
+        "trainable_pct": 100 * trainable_count / total_count,
+        "history": history,
+        "final_val_acc": history[-1]["val_acc"],
+        "final_train_acc": history[-1]["train_acc"],
+    }
+
+    results_path = f"output/{args.mode}_results.json"
+    with open(results_path, "w") as f:
+        json.dump(results, f, indent=2)
+    print(f"Saved results to {results_path}")
 
 
 if __name__ == "__main__":

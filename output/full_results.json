@@ -1,0 +1,26 @@
+{
+  "mode": "full",
+  "config": {
+    "epochs": 1,
+    "batch_size": 8,
+    "lr": 0.0001,
+    "seed": 1,
+    "lora_rank": null,
+    "lora_alpha": null
+  },
+  "training_time_seconds": 164.188294172287,
+  "trainable_params": 5526346,
+  "total_params": 5526346,
+  "trainable_pct": 100.0,
+  "history": [
+    {
+      "epoch": 1,
+      "train_loss": 0.6327920948303307,
+      "train_acc": 0.787590027700831,
+      "val_loss": 0.40738526935961505,
+      "val_acc": 0.8640875540850089
+    }
+  ],
+  "final_val_acc": 0.8640875540850089,
+  "final_train_acc": 0.787590027700831
+}

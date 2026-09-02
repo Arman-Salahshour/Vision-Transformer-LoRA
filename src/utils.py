@@ -1,3 +1,5 @@
+"common used functions"
+
 import random
 import time
 

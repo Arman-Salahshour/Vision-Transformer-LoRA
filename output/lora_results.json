@@ -1,0 +1,26 @@
+{
+  "mode": "lora",
+  "config": {
+    "epochs": 1,
+    "batch_size": 8,
+    "lr": 0.0001,
+    "seed": 1,
+    "lora_rank": 10,
+    "lora_alpha": null
+  },
+  "training_time_seconds": 146.80076789855957,
+  "trainable_params": 140554,
+  "total_params": 3885898,
+  "trainable_pct": 3.6170275184783542,
+  "history": [
+    {
+      "epoch": 1,
+      "train_loss": 0.6823905764786021,
+      "train_acc": 0.7827146814404432,
+      "val_loss": 0.23642011067160867,
+      "val_acc": 0.9274624586408755
+    }
+  ],
+  "final_val_acc": 0.9274624586408755,
+  "final_train_acc": 0.7827146814404432
+}

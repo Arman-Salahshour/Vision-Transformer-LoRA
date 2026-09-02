@@ -10,8 +10,8 @@ all: setup data run
 
 setup:
 	module purge && \
-	module load JupyterLab/3.5.0-GCCcore-11.3.0 && \
-	source /fp/projects01/ec517/venvs/in5310/bin/activate && \
+	module load JupyterLab/4.2.5-GCCcore-13.3.0 && \
+	source /projects/ec674/venvs/in5310h26/bin/activate && \
 	pip install -r requirements.txt --user
 
 data:
@@ -25,9 +25,9 @@ data:
 
 run:
 	module purge && \
-	module load JupyterLab/3.5.0-GCCcore-11.3.0 && \
-	source /fp/projects01/ec517/venvs/in5310/bin/activate && \
+	module load JupyterLab/4.2.5-GCCcore-13.3.0 && \
+	source /projects/ec674/venvs/in5310h26/bin/activate && \
 	python src/train.py --mode $(MODE)
 
 clean:
-	rm -f output/*.pt
+	rm -f output/*.pt output/*_results.json
