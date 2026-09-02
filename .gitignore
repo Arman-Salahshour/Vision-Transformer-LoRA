@@ -6,4 +6,4 @@ output/*.pt
 .venv/
 *.egg-info/
 .DS_Store
-*.png
+slrum*.out
